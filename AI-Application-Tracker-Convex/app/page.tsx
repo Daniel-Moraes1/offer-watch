@@ -1,118 +1,146 @@
+// app/page.tsx
+
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-  Authenticated,
-  Unauthenticated,
-  useMutation,
-  useQuery,
-} from "convex/react";
-import { api } from "@/convex/_generated/api";
-import { Code } from "@/components/typography/code";
-import { Link } from "@/components/typography/link";
-import { SignInButton, SignUpButton, UserButton } from "@clerk/clerk-react";
-import { StickyHeader } from "@/components/layout/sticky-header";
-import { Skeleton } from "@/components/ui/skeleton";
+import './globals.css';
+import { useState, useEffect } from 'react';
+import { useUser, RedirectToSignIn } from "@clerk/nextjs";
+
+// Helper function to sort based on the selected column and order
+const sortData = (data, sortColumn, sortDirection) => {
+  return [...data].sort((a, b) => {
+    if (!a[sortColumn]) return 1;
+    if (!b[sortColumn]) return -1;
+
+    const valueA = a[sortColumn].toLowerCase ? a[sortColumn].toLowerCase() : a[sortColumn];
+    const valueB = b[sortColumn].toLowerCase ? b[sortColumn].toLowerCase() : b[sortColumn];
+
+    if (sortDirection === 'asc') {
+      return valueA > valueB ? 1 : -1;
+    } else {
+      return valueA < valueB ? 1 : -1;
+    }
+  });
+};
+
+const JobApplications = ({ jobApplications }) => {
+  const [sortColumn, setSortColumn] = useState('title');
+  const [sortDirection, setSortDirection] = useState('asc');
+
+  const handleSort = (column) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
+
+  const sortedData = sortData(jobApplications, sortColumn, sortDirection);
+
+  const renderSortIcon = (column) => {
+    if (sortColumn !== column) return null;
+    return sortDirection === 'asc' ? ' ↑' : ' ↓';
+  };
+
+  return (
+    <table>
+      <thead>
+        <tr>
+          <th onClick={() => handleSort('title')}>Job Title {renderSortIcon('title')}</th>
+          <th onClick={() => handleSort('company')}>Company Name {renderSortIcon('company')}</th>
+          <th onClick={() => handleSort('status')}>Status {renderSortIcon('status')}</th>
+          <th>Job Description</th>
+          <th onClick={() => handleSort('applicationDate')}>Application Date {renderSortIcon('applicationDate')}</th>
+          <th onClick={() => handleSort('dueDate')}>Due Date {renderSortIcon('dueDate')}</th>
+          <th onClick={() => handleSort('lastActionDate')}>Last Action Date {renderSortIcon('lastActionDate')}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {sortedData.map((job, index) => (
+          <tr key={index}>
+            <td>{job.title}</td>
+            <td>{job.company}</td>
+            <td>
+              <span className={`status-badge ${job.status.toLowerCase()}`}>
+                {job.status}
+              </span>
+            </td>
+            <td>
+              <a href={job.jobDescriptionLink} target="_blank" rel="noopener noreferrer">
+                View Job
+              </a>
+            </td>
+            <td>{new Date(job.applicationDate).toLocaleDateString()}</td>
+            <td>{job.dueDate ? new Date(job.dueDate).toLocaleDateString() : 'N/A'}</td>
+            <td>{job.lastActionDate ? new Date(job.lastActionDate).toLocaleDateString() : 'N/A'}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+};
+
+// Simulate fetching job data dynamically (mocked for now)
+const fetchJobApplications = async (userId) => {
+  return [
+    {
+      title: 'Frontend Developer',
+      company: 'Google',
+      status: 'Applied',
+      jobDescriptionLink: 'https://google.com',
+      applicationDate: '2024-09-01',
+      dueDate: '2024-09-15',
+      lastActionDate: '2024-09-10',
+    },
+    {
+      title: 'Backend Developer',
+      company: 'Apple',
+      status: 'Interviewed',
+      jobDescriptionLink: 'https://apple.com',
+      applicationDate: '2024-08-20',
+      dueDate: null,
+      lastActionDate: '2024-09-12',
+    },
+  ];
+};
 
 export default function Home() {
-  return (
-    <>
-      <StickyHeader className="px-4 py-2">
-        <div className="flex justify-between items-center">
-          Convex + Next.js + Clerk
-          <SignInAndSignUpButtons />
-        </div>
-      </StickyHeader>
-      <main className="container max-w-2xl flex flex-col gap-8">
-        <h1 className="text-4xl font-extrabold my-8 text-center">
-          Convex + Next.js + Clerk Auth
-        </h1>
-        <Authenticated>
-          <SignedInContent />
-        </Authenticated>
-        <Unauthenticated>
-          <p>Click one of the buttons in the top right corner to sign in.</p>
-        </Unauthenticated>
-      </main>
-    </>
-  );
-}
+  const { user, isSignedIn, isLoaded } = useUser();
+  const [jobApplications, setJobApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-function SignInAndSignUpButtons() {
-  return (
-    <div className="flex gap-4">
-      <Authenticated>
-        <UserButton afterSignOutUrl="#" />
-      </Authenticated>
-      <Unauthenticated>
-        <SignInButton mode="modal">
-          <Button variant="ghost">Sign in</Button>
-        </SignInButton>
-        <SignUpButton mode="modal">
-          <Button>Sign up</Button>
-        </SignUpButton>
-      </Unauthenticated>
-    </div>
-  );
-}
+  useEffect(() => {
+    if (isSignedIn && user?.id) {
+      setLoading(true);
+      fetchJobApplications(user.id)
+        .then((data) => {
+          setJobApplications(data);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching job data:", error);
+          setLoading(false);
+        });
+    }
+  }, [isSignedIn, user]);
 
-function SignedInContent() {
-  const { viewer, numbers } =
-    useQuery(api.myFunctions.listNumbers, {
-      count: 10,
-    }) ?? {};
-  const addNumber = useMutation(api.myFunctions.addNumber);
+  if (!isLoaded) {
+    return <div>Loading...</div>; // Wait for Clerk to load user info
+  }
 
-  if (viewer === undefined || numbers === undefined) {
-    return (
-      <>
-        <Skeleton className="h-5 w-full" />
-        <Skeleton className="h-5 w-full" />
-        <Skeleton className="h-5 w-full" />
-      </>
-    );
+  if (!isSignedIn) {
+    return <RedirectToSignIn />; // Redirect to sign-in page if not authenticated
   }
 
   return (
-    <>
-      <p>Welcome {viewer ?? "N/A"}!</p>
-      <p>
-        Click the button below and open this page in another window - this data
-        is persisted in the Convex cloud database!
-      </p>
-      <p>
-        <Button
-          onClick={() => {
-            void addNumber({ value: Math.floor(Math.random() * 10) });
-          }}
-        >
-          Add a random number
-        </Button>
-      </p>
-      <p>
-        Numbers:{" "}
-        {numbers?.length === 0
-          ? "Click the button!"
-          : numbers?.join(", ") ?? "..."}
-      </p>
-      <p>
-        Edit <Code>convex/myFunctions.ts</Code> to change your backend
-      </p>
-      <p>
-        Edit <Code>app/page.tsx</Code> to change your frontend
-      </p>
-      <p>
-        Check out{" "}
-        <Link target="_blank" href="https://docs.convex.dev/home">
-          Convex docs
-        </Link>
-      </p>
-      <p>
-        To build a full page layout copy one of the included{" "}
-        <Link target="_blank" href="/layouts">
-          layouts
-        </Link>
-      </p>
-    </>
+    <div>
+      <h1>Welcome, {user?.firstName}!</h1>
+      {loading ? (
+        <p>Loading your job applications...</p>
+      ) : (
+        <JobApplications jobApplications={jobApplications} />
+      )}
+    </div>
   );
 }
