@@ -1,0 +1,19 @@
+{
+  "name": "ai-application-tracker",
+  "version": "1.0.0",
+  "description": "Automatically parse your emails for the application status of jobs &amp; internships.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dan-builds-robots/ai-application-tracker.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dan-builds-robots/ai-application-tracker/issues"
+  },
+  "homepage": "https://github.com/dan-builds-robots/ai-application-tracker#readme"
+}
