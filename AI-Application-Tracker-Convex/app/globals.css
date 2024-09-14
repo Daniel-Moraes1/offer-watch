@@ -76,3 +76,48 @@
     @apply bg-background text-foreground min-h-full;
   }
 }
+
+
+/* styles/globals.css */
+
+body {
+  background-color: white;
+  color: black;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse; /* Ensures no gaps between cells */
+  margin-top: 20px;
+}
+
+th, td {
+  border: 2px solid orange; /* Orange grid lines */
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background-color: #e0e0e0; /* Slightly darker gray for the column headers */
+  font-weight: bold;
+  color: black; /* Black text for headers */
+  transition: background-color 0.3s ease; /* Smooth transition effect */
+}
+
+th:hover {
+  background-color: grey; /* Grey background on hover */
+  cursor: pointer; /* Change cursor to pointer for better UX */
+}
+
+td {
+  background-color: #f5f5f5; /* Lighter gray for the rest of the table */
+  color: black; /* Black text for the cells */
+}
+
+/* Set alternating row colors for better visibility */
+tr:nth-child(even) td {
+  background-color: #f9f9f9;
+}
