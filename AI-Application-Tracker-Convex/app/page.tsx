@@ -91,8 +91,16 @@ const JobApplications = ({ jobApplications }) => {
 // Simulate fetching job data dynamically (mocked for now)
 const fetchJobApplications = async (email) => {
     console.log("testx2");
-    const result = await convex.query(api.myFunctions.getApplications, { 
+    const result = await convex?.query(api.myFunctions.getApplications, { 
     email});
+
+    // post dummy results
+    await convex?.mutation(api.myFunctions.upsertJobApplication, {
+      company: "Johns Hopkins APL",
+      email: "danielmoraes5542@gmail.com",
+      role: "Software Engineer [2025]",
+      application: "..."
+    })
     return result;
 };
 
@@ -143,3 +151,6 @@ const fetchJobApplications = async (email) => {
     </div>
   );
 }
+
+
+
