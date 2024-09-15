@@ -8,16 +8,14 @@ import { type } from "os";
 
 function extractHeaders(headers: HeadersList) {
     const headerMap = new Map(headers.entries());
-    console.log(headerMap)
-    console.log(headerMap.get('email'))
-    const email = headerMap.get('email') || null;
-    const role = headerMap.get('role') || null;
-    const company = headerMap.get('company') || null;
-    const status = headerMap.get('status') || null;
-    const jobDescriptionLink = headerMap.get('jobdescriptionlink') || null;
-    const applicationDate = headerMap.get('applicationdate') || null;
-    const dueDate = headerMap.get('duedate') || null;
-    const lastActionDate = headerMap.get('lastactiondate') || null;
+    const email = headerMap.get('email') || ""; 
+    const role = headerMap.get('role') || "";
+    const company = headerMap.get('company') || "";
+    const status = headerMap.get('status') || "";
+    const jobDescriptionLink = headerMap.get('jobdescriptionlink') || "";
+    const applicationDate = headerMap.get('applicationdate') || "";
+    const dueDate = headerMap.get('duedate') || "";
+    const lastActionDate = headerMap.get('lastactiondate') || "";
 
     return {
         email,
