@@ -1,5 +1,4 @@
 require("dotenv").config();
-console.log("chatgpt api key: ", process.env.CHATGPT_API_KEY);
 
 async function processMessageToChatGPT(emailSubject, emailText) {
   try {

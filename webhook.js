@@ -56,6 +56,10 @@ app.post("/pubsub", async (req, res) => {
     const chatResponse = await processMessageToChatGPT(subject, body);
     console.log("chatResponse:", chatResponse);
 
+    if (chatResponse.status !== "Unrelated") {
+      // send status to frontend
+    }
+
     res.status(200).send("OK");
   } catch (error) {
     console.error("Error processing notification:", error);
