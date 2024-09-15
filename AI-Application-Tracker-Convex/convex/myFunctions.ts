@@ -51,35 +51,19 @@ export const upsertJobApplication = mutation({
   },
 });
 
-/*
-export const upsertJobApplication = mutation(async ({ db }: {db:any}, { email, company, role, application } : { email:string, company:string, role:string, application:any}) => {
-  // Check if a document with the same email, company, and role already exists
-  const existingDoc = await db.query("job_applications")
-    .filter((q: any) => q.eq(q.field("email"), email))
-    .filter((q: any) => q.eq(q.field("company"), company))
-    .filter((q: any) => q.eq(q.field("role"), role))
-    .first();
+export const getApplications = query({
+  // Validators for arguments.
+  args: {
+    email: v.string()
+  },
 
-  if (existingDoc) {
-    // Document exists, so update it
-    await db.patch(existingDoc._id, {
-      status: application.status,
-      jobDescriptionLink: application.jobDescriptionLink,
-      applicationDate: application.applicationDate,
-      dueDate: application.dueDate,
-      lastActionDate: application.lastActionDate
-    });
-  } else {
-    // Insert a new document if it doesn't exist
-    await db.insert("job_applications", {
-      email,
-      company,
-      role,
-      status: application.status,
-      jobDescriptionLink: application.jobDescriptionLink,
-      applicationDate: application.applicationDate,
-      dueDate: application.dueDate,
-      lastActionDate: application.lastActionDate
-    });
-  }
-}); */
+  // Query implementation.
+  handler: async (ctx, args) => {
+    console.log(args.email);
+    const doc = await ctx.db.query("job_applications")
+    //const doc = await ctx.db.query("job_applications")
+    .filter((q: any) => q.eq(q.field("email"), args.email)).collect()
+    console.log(doc);
+    return doc;
+  },
+});

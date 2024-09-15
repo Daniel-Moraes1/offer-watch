@@ -1,7 +1,8 @@
 import { upsertJobApplication } from '../../../convex/myFunctions';
-import convex from "../../../lib/convexClient"
+import convex from "../../../lib/convexClient";
 import { mutation } from '../../../convex/_generated/server';
-
+import { useConvex } from 'convex/react';
+import { api } from "../../../convex/_generated/api";
 
 export default async function handler(req:any, res:any) {
     if (req.method === 'POST') {
@@ -15,7 +16,7 @@ export default async function handler(req:any, res:any) {
             applicationDate,
             dueDate,
             lastActionDate,
-        } = req.body;
+        } = req.body; 
 
         const application = {
             email,
@@ -35,7 +36,17 @@ export default async function handler(req:any, res:any) {
 
         try {
             // Call the upsertJobApplication function
-            await ("users", { email, company, role, application });
+            if (convex != null) {
+                const result = await convex.mutation(api.myFunctions.upsertJobApplication, { 
+                    email, 
+                    company, 
+                    role, 
+                    application 
+                });
+            }
+            else {
+                throw new Error("Database client not defined");
+            }
 
             res.status(200).json({ message: 'Job application upserted successfully' });
         } catch (error) {

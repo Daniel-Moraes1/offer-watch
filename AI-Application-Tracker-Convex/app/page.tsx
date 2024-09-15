@@ -1,6 +1,12 @@
 // app/page.tsx
-
 "use client";
+
+import { upsertJobApplication } from '../convex/myFunctions';
+import convex from "../lib/convexClient";
+import { mutation } from '../convex/_generated/server';
+import { useConvex } from 'convex/react';
+import { api } from "../convex/_generated/api";
+
 
 import './globals.css';
 import { useState, useEffect } from 'react';
@@ -82,47 +88,35 @@ const JobApplications = ({ jobApplications }) => {
 };
 
 // Simulate fetching job data dynamically (mocked for now)
-const fetchJobApplications = async (userId) => {
-  return [
-    {
-      title: 'Frontend Developer',
-      company: 'Google',
-      status: 'Applied',
-      jobDescriptionLink: 'https://google.com',
-      applicationDate: '2024-09-01',
-      dueDate: '2024-09-15',
-      lastActionDate: '2024-09-10',
-    },
-    {
-      title: 'Backend Developer',
-      company: 'Apple',
-      status: 'Interviewed',
-      jobDescriptionLink: 'https://apple.com',
-      applicationDate: '2024-08-20',
-      dueDate: null,
-      lastActionDate: '2024-09-12',
-    },
-  ];
+const fetchJobApplications = async (email) => {
+    console.log("testx2");
+    const result = await convex.query(api.myFunctions.getApplications, { 
+    email});
+    return result;
 };
 
-export default function Home() {
+ export default function Home() {
   const { user, isSignedIn, isLoaded } = useUser();
   const [jobApplications, setJobApplications] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (isSignedIn && user?.id) {
-      setLoading(true);
-      fetchJobApplications(user.id)
-        .then((data) => {
+    console.log("something");
+    const fetchData = async () => {
+      if (isSignedIn && user?.id) {
+        setLoading(true);
+        try {
+          const data = await fetchJobApplications(user.primaryEmailAddress?.emailAddress); // Pass user email to fetchJobApplications
           setJobApplications(data);
-          setLoading(false);
-        })
-        .catch((error) => {
+        } catch (error) {
           console.error("Error fetching job data:", error);
+        } finally {
           setLoading(false);
-        });
-    }
+        }
+      }
+    };
+
+    fetchData();
   }, [isSignedIn, user]);
 
   if (!isLoaded) {
