@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const { google } = require("googleapis");
-const axios = require("axios");
+const { processMessageToChatGPT } = require("./chat.js");
 
 const app = express();
 app.use(bodyParser.json());
@@ -23,12 +23,6 @@ app.post("/pubsub", async (req, res) => {
     // Use the Gmail API to fetch the new email
     const auth = await authorize();
     const gmail = google.gmail({ version: "v1", auth });
-
-    const emailObj = await gmail.users.history.list({
-      userId: "me",
-      startHistoryId: message.historyId,
-      maxResults: 1,
-    });
 
     const messages = await gmail.users.messages.list({
       userId: "me",
@@ -58,6 +52,9 @@ app.post("/pubsub", async (req, res) => {
 
     console.log(`Email Subject:\n${subject}`);
     console.log(`Email Body:\n${body}`);
+
+    const chatResponse = await processMessageToChatGPT(subject, body);
+    console.log("chatResponse:", chatResponse);
 
     res.status(200).send("OK");
   } catch (error) {
