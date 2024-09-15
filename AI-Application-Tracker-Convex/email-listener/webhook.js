@@ -65,10 +65,11 @@ app.post("/pubsub", async (req, res) => {
         headers: {
           "Content-Type": "application/json",
           ...chatResponse,
+          email: "daniel.o.ajayi@gmail.com",
         },
       })
-        .then((response) => response.json()) // Yeah, we like our responses in JSON format! 😎
-        .then((data) => console.log("Success:", data)) // Log that sweet success
+        // like our responses in JSON format! 😎
+        .then((response) => console.log("Success:", response)) // Log that sweet success
         .catch((error) => console.error("Error:", error)); // Or catch any oopsies 🙈
       res.status(200).send("OK");
     }

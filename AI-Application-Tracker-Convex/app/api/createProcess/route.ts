@@ -55,16 +55,7 @@ export async function POST(req: any, res: any) {
     );
 
     // Validate required fields
-    if (
-      !email ||
-      !role ||
-      !company ||
-      !status ||
-      !jobDescriptionLink ||
-      !applicationDate ||
-      !dueDate ||
-      !lastActionDate
-    ) {
+    if (!email || !company) {
       return new NextResponse("Missing fields", { status: 500 });
     }
 
