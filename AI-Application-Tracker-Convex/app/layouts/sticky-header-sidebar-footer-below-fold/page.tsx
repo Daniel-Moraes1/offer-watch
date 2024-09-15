@@ -10,7 +10,7 @@ export default function Layout() {
     <>
       <StickyHeader className="p-2">Sticky header</StickyHeader>
       {/* Remove `container` if you want full-page width layout */}
-      <div className="container grid grid-cols-[240px_minmax(0,1fr)]">
+      <div className="grid grid-cols-[240px_minmax(0,1fr)]">
         <StickySidebar className="top-[calc(2.5rem+1px)] h-[calc(100vh-(2.5rem+1px))]">
           <div>Sticky sidebar</div>
           <FakeWordList count={3} length={[4, 15]} capitalize />
