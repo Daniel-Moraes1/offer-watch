@@ -393,7 +393,9 @@ const JobApplications = ({
 
 // Simulate fetching job data dynamically
 const fetchJobApplications = async (email) => {
-  const result = await convex?.query(api.myFunctions.getApplications, { email });
+  const result = await convex?.query(api.myFunctions.getApplications, {
+    email,
+  });
   return result;
 };
 
@@ -420,6 +422,15 @@ export default function Home() {
     };
 
     fetchData();
+    const heartbeatPeriod = 1000 * 5;
+    const intervalId = setInterval(() => {
+      fetchData()
+        .then(() => {})
+        .catch((error) => {
+          console.error("Error fetching job data:", error);
+        });
+    }, heartbeatPeriod);
+    return () => clearInterval(intervalId);
   }, [isSignedIn, user]);
 
   const handleAddJobApplication = async (newJob) => {
@@ -433,7 +444,10 @@ export default function Home() {
       };
 
       console.log("Adding job:", jobWithEmail);
-      await convex?.mutation(api.myFunctions.upsertJobApplication, jobWithEmail);
+      await convex?.mutation(
+        api.myFunctions.upsertJobApplication,
+        jobWithEmail
+      );
       setJobApplications([...jobApplications, jobWithEmail]);
     } catch (error) {
       console.error("Error adding job:", error);
