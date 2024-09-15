@@ -10,23 +10,33 @@ import { api } from "./_generated/api";
 // Flattened arguments for upsertJobApplication mutation
 export const upsertJobApplication = mutation({
   args: {
-    email: v.string(),    // Email of the user
-    company: v.string(),  // Company name
-    role: v.string(),     // Job role
-    status: v.string(),   // Status of the application
+    email: v.string(), // Email of the user
+    company: v.string(), // Company name
+    role: v.string(), // Job role
+    status: v.string(), // Status of the application
     jobDescriptionLink: v.optional(v.string()), // Optional job description link
-    applicationDate: v.string(),   // Date of application
-    dueDate: v.optional(v.string()),  // Optional due date
-    lastActionDate: v.optional(v.string())  // Optional last action date
+    applicationDate: v.string(), // Date of application
+    dueDate: v.optional(v.string()), // Optional due date
+    lastActionDate: v.optional(v.string()), // Optional last action date
   },
   handler: async (ctx, args) => {
-    const { email, company, role, status, jobDescriptionLink, applicationDate, dueDate, lastActionDate } = args;
+    const {
+      email,
+      company,
+      role,
+      status,
+      jobDescriptionLink,
+      applicationDate,
+      dueDate,
+      lastActionDate,
+    } = args;
 
     // Check if a job application already exists for the user, company, and role
-    const existingDoc = await ctx.db.query("job_applications")
-      .filter(q => q.eq(q.field('email'), email))
-      .filter(q => q.eq(q.field('company'), company))
-      .filter(q => q.eq(q.field('role'), role))
+    const existingDoc = await ctx.db
+      .query("job_applications")
+      .filter((q) => q.eq(q.field("email"), email))
+      .filter((q) => q.eq(q.field("company"), company))
+      // .filter(q => q.eq(q.field('role'), role))
       .first();
 
     if (existingDoc) {
@@ -36,7 +46,7 @@ export const upsertJobApplication = mutation({
         jobDescriptionLink,
         applicationDate,
         dueDate,
-        lastActionDate
+        lastActionDate,
       });
     } else {
       // Insert a new document if it doesn't exist
@@ -48,24 +58,25 @@ export const upsertJobApplication = mutation({
         jobDescriptionLink: jobDescriptionLink ?? "",
         applicationDate,
         dueDate,
-        lastActionDate
+        lastActionDate,
       });
     }
-  }
+  },
 });
-
 
 export const getApplications = query({
   // Validators for arguments.
   args: {
-    email: v.string()
+    email: v.string(),
   },
 
   // Query implementation.
   handler: async (ctx, args) => {
     console.log(args.email);
-    const doc = await ctx.db.query("job_applications")
-    .filter((q: any) => q.eq(q.field("email"), args.email)).collect()
+    const doc = await ctx.db
+      .query("job_applications")
+      .filter((q: any) => q.eq(q.field("email"), args.email))
+      .collect();
     console.log(doc);
     return doc;
   },
@@ -74,27 +85,37 @@ export const getApplications = query({
 // Mutation to delete a job application based on primary key (email, company, title)
 export const deleteJobApplication = mutation({
   args: {
-    email: v.string(),    // Email of the user
-    company: v.string(),  // Company name
-    role: v.string(),     // Job role
-    status: v.string(),   // Status of the application
+    email: v.string(), // Email of the user
+    company: v.string(), // Company name
+    role: v.string(), // Job role
+    status: v.string(), // Status of the application
     jobDescriptionLink: v.optional(v.string()), // Optional job description link
-    applicationDate: v.string(),   // Date of application
-    dueDate: v.optional(v.string()),  // Optional due date
-    lastActionDate: v.optional(v.string())  // Optional last action date
+    applicationDate: v.string(), // Date of application
+    dueDate: v.optional(v.string()), // Optional due date
+    lastActionDate: v.optional(v.string()), // Optional last action date
   },
   handler: async (ctx, args) => {
-    const { email, company, role, status, jobDescriptionLink, applicationDate, dueDate, lastActionDate } = args;
+    const {
+      email,
+      company,
+      role,
+      status,
+      jobDescriptionLink,
+      applicationDate,
+      dueDate,
+      lastActionDate,
+    } = args;
 
     // Check if a job application already exists for the user, company, and role
-    const existingJob = await ctx.db.query('job_applications')
-    .filter(q => q.eq(q.field('email'), email))
-    .filter(q => q.eq(q.field('company'), company))
-    .filter(q => q.eq(q.field('role'), role))
-    .first();
+    const existingJob = await ctx.db
+      .query("job_applications")
+      .filter((q) => q.eq(q.field("email"), email))
+      .filter((q) => q.eq(q.field("company"), company))
+      .filter((q) => q.eq(q.field("role"), role))
+      .first();
 
-  if (existingJob) {
-    await ctx.db.delete(existingJob._id);
-  }
-  }
+    if (existingJob) {
+      await ctx.db.delete(existingJob._id);
+    }
+  },
 });
