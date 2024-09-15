@@ -7,53 +7,53 @@ import { api } from "./_generated/api";
 
 // Mutation to add or update a job application
 
+// Flattened arguments for upsertJobApplication mutation
 export const upsertJobApplication = mutation({
-  // Validators for arguments.
   args: {
-    email:v.string(),
-    company:v.string(),
-    role:v.string(),
-    status:v.string(),
-    jobDescriptionLink:v.string(),
-    applicationDate:v.string(),
-    dueDate:v.string(),
-    lastActionDate:v.string()
+    email: v.string(),    // Email of the user
+    company: v.string(),  // Company name
+    role: v.string(),     // Job role
+    status: v.string(),   // Status of the application
+    jobDescriptionLink: v.optional(v.string()), // Optional job description link
+    applicationDate: v.string(),   // Date of application
+    dueDate: v.optional(v.string()),  // Optional due date
+    lastActionDate: v.optional(v.string())  // Optional last action date
   },
-
-  // Query implementation.
   handler: async (ctx, args) => {
+    const { email, company, role, status, jobDescriptionLink, applicationDate, dueDate, lastActionDate } = args;
 
-      const existingDoc = await ctx.db.query("job_applications")
-    .filter((q: any) => q.eq(q.field("email"), args.email))
-    .filter((q: any) => q.eq(q.field("company"), args.company))
-    .filter((q: any) => q.eq(q.field("role"), args.role))
-    .first();
-    //// Read the database as many times as you need here.
-    //// See https://docs.convex.dev/database/reading-data.
+    // Check if a job application already exists for the user, company, and role
+    const existingDoc = await ctx.db.query("job_applications")
+      .filter(q => q.eq(q.field('email'), email))
+      .filter(q => q.eq(q.field('company'), company))
+      .filter(q => q.eq(q.field('role'), role))
+      .first();
+
     if (existingDoc) {
-      // Document exists, so update it
+      // If the document exists, update it
       await ctx.db.patch(existingDoc._id, {
-        status: args.status,
-        jobDescriptionLink: args.jobDescriptionLink,
-        applicationDate: args.applicationDate,
-        dueDate: args.dueDate,
-        lastActionDate: args.lastActionDate
+        status,
+        jobDescriptionLink,
+        applicationDate,
+        dueDate,
+        lastActionDate
       });
     } else {
       // Insert a new document if it doesn't exist
       await ctx.db.insert("job_applications", {
-        email: args.email,
-        company: args.company,
-        role: args.role,
-        status: args.status,
-        jobDescriptionLink: args.jobDescriptionLink,
-        applicationDate: args.applicationDate,
-        dueDate: args.dueDate,
-        lastActionDate: args.lastActionDate
+        email,
+        company,
+        role,
+        status,
+        jobDescriptionLink: jobDescriptionLink ?? "",
+        applicationDate,
+        dueDate,
+        lastActionDate
       });
     }
-  },
+  }
 });
+
 
 export const getApplications = query({
   // Validators for arguments.
@@ -69,4 +69,32 @@ export const getApplications = query({
     console.log(doc);
     return doc;
   },
+});
+
+// Mutation to delete a job application based on primary key (email, company, title)
+export const deleteJobApplication = mutation({
+  args: {
+    email: v.string(),    // Email of the user
+    company: v.string(),  // Company name
+    role: v.string(),     // Job role
+    status: v.string(),   // Status of the application
+    jobDescriptionLink: v.optional(v.string()), // Optional job description link
+    applicationDate: v.string(),   // Date of application
+    dueDate: v.optional(v.string()),  // Optional due date
+    lastActionDate: v.optional(v.string())  // Optional last action date
+  },
+  handler: async (ctx, args) => {
+    const { email, company, role, status, jobDescriptionLink, applicationDate, dueDate, lastActionDate } = args;
+
+    // Check if a job application already exists for the user, company, and role
+    const existingJob = await ctx.db.query('job_applications')
+    .filter(q => q.eq(q.field('email'), email))
+    .filter(q => q.eq(q.field('company'), company))
+    .filter(q => q.eq(q.field('role'), role))
+    .first();
+
+  if (existingJob) {
+    await ctx.db.delete(existingJob._id);
+  }
+  }
 });
