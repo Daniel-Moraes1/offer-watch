@@ -26,7 +26,7 @@ export const upsertJobApplication = mutation({
     const existingDoc = await ctx.db.query("job_applications")
       .filter(q => q.eq(q.field('email'), email))
       .filter(q => q.eq(q.field('company'), company))
-      .filter(q => q.eq(q.field('role'), role))
+      //.filter(q => q.eq(q.field('role'), role)) Remove filter from row
       .first();
 
     if (existingDoc) {
@@ -34,7 +34,6 @@ export const upsertJobApplication = mutation({
       await ctx.db.patch(existingDoc._id, {
         status,
         jobDescriptionLink,
-        applicationDate,
         dueDate,
         lastActionDate
       });
