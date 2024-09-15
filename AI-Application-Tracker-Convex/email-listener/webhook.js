@@ -60,7 +60,7 @@ app.post("/pubsub", async (req, res) => {
     const chatResponse = await processMessageToChatGPT(subject, body);
     console.log("chatResponse:", chatResponse);
     if (chatResponse.status !== "Unrelated") {
-      const url = "localhost:3000/createProcess"; // Change this to your API endpoint
+      const url = "localhost:3000/api/createProcess"; // Change this to your API endpoint
       console.log("PUB SUB ACTIVATED");
       fetch(url, {
         method: 'POST', 
