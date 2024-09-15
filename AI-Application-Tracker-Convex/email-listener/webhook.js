@@ -59,27 +59,21 @@ app.post("/pubsub", async (req, res) => {
 
     const chatResponse = await processMessageToChatGPT(subject, body);
     console.log("chatResponse:", chatResponse);
-
     if (chatResponse.status !== "Unrelated") {
+      const url = "localhost:3000/createProcess"; // Change this to your API endpoint
       console.log("PUB SUB ACTIVATED");
-      await convex?.mutation(api.myFunctions.upsertJobApplication, {
-        email: "justin.c.okorie@gmail.com",
-        company: "Johns Hopkins APL",
-        role: "SWE",
-        status: "Accepted",
-        jobDescriptionLink: "No link",
-        applicationDate: "2024-09-30",  // ISO date format
-        dueDate: "2024-10-01",           // ISO date format
-        lastActionDate: "2023-04-10"     // ISO date format
-      })
-    }
-
+      fetch(url, {
+        method: 'POST', 
+        headers: chatResponse
+    })
+    .then(response => response.json())  // Yeah, we like our responses in JSON format! 😎
+    .then(data => console.log('Success:', data))  // Log that sweet success
+    .catch((error) => console.error('Error:', error));  // Or catch any oopsies 🙈
     res.status(200).send("OK");
-  } catch (error) {
-    console.error("Error processing notification:", error);
-    res.status(200).send("Error");
   }
-});
+} catch (error) {
+  console.error('Error:', error)
+}});
 
 // Start the Express server
 const PORT = process.env.PORT || 8080;
