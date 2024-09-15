@@ -1,15 +1,9 @@
-// app/page.tsx
 "use client";
 import { Lexend } from "next/font/google";
-import { upsertJobApplication } from "../convex/myFunctions";
-import convex from "../lib/convexClient";
-import { mutation } from "../convex/_generated/server";
-import { useConvex } from "convex/react";
-import { api } from "../convex/_generated/api";
-
-import "./globals.css";
 import { useState, useEffect } from "react";
 import { useUser, RedirectToSignIn } from "@clerk/nextjs";
+import { api } from "../convex/_generated/api"; // Assuming Convex setup is correct
+import convex from "../lib/convexClient";
 
 const lexend = Lexend({
   subsets: [],
@@ -37,9 +31,19 @@ const sortData = (data, sortColumn, sortDirection) => {
   });
 };
 
-const JobApplications = ({ jobApplications }) => {
+const JobApplications = ({ jobApplications, onAddJobApplication }) => {
   const [sortColumn, setSortColumn] = useState("title");
   const [sortDirection, setSortDirection] = useState("asc");
+  const [isAdding, setIsAdding] = useState(false);
+  const [newJob, setNewJob] = useState({
+    company: "",
+    title: "",
+    jobDescriptionLink: "",
+    applicationDate: "",
+    dueDate: "",
+    lastActionDate: "",
+    status: "",
+  });
 
   const handleSort = (column) => {
     if (sortColumn === column) {
@@ -57,81 +61,182 @@ const JobApplications = ({ jobApplications }) => {
     return sortDirection === "asc" ? " ↑" : " ↓";
   };
 
-  const statusColors: { [key: string]: string } = {
-    applied: "#118AB2",
-    "interview pending": "#6fadfd",
-    rejected: "#EF476F",
-    accepted: "#06D6A0",
+  const handleAdd = (e) => {
+    e.preventDefault();
+    onAddJobApplication(newJob);
+    setIsAdding(false);
+    setNewJob({
+      company: "",
+      title: "",
+      jobDescriptionLink: "",
+      applicationDate: "",
+      dueDate: "",
+      lastActionDate: "",
+      status: "",
+    });
   };
 
   return (
-    <table border={1} rules={"rows"}>
-      <thead style={{}}>
-        <th onClick={() => handleSort("company")}>
-          Company Name {renderSortIcon("company")}
-        </th>
-        <th onClick={() => handleSort("title")}>
-          Job Title {renderSortIcon("title")}
-        </th>
-        <th>Job Description</th>
-        <th onClick={() => handleSort("applicationDate")}>
-          Application Date {renderSortIcon("applicationDate")}
-        </th>
-        <th onClick={() => handleSort("dueDate")}>
-          Due Date {renderSortIcon("dueDate")}
-        </th>
-        <th onClick={() => handleSort("lastActionDate")}>
-          Last Action Date {renderSortIcon("lastActionDate")}
-        </th>
-        <th onClick={() => handleSort("status")}>
-          Status {renderSortIcon("status")}
-        </th>
-      </thead>
-
-      <tbody style={{}}>
-        {sortedData.map((job, index) => (
-          <tr key={index}>
-            <td>{job.company}</td>
-            <td>{job.role !== "null" ? job.role : "N/A"}</td>
-            <td>
-              <a
-                href={job.jobDescriptionLink}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View Job
-              </a>
-            </td>
-            <td>{new Date(job.applicationDate).toLocaleDateString()}</td>
-            <td>
-              {job.dueDate ? new Date(job.dueDate).toLocaleDateString() : "N/A"}
-            </td>
-            <td>
-              {job.lastActionDate
-                ? new Date(job.lastActionDate).toLocaleDateString()
-                : "N/A"}
-            </td>
-            <td
-              style={{
-                backgroundColor: statusColors[job.status.toLowerCase()],
-                color: "white",
-              }}
-            >
-              <span className={`status-badge ${job.status.toLowerCase()}`}>
-                {job.status}
-              </span>
-            </td>
+    <form onSubmit={handleAdd}>
+      <table border={1} rules={"rows"}>
+        <thead>
+          <tr>
+            <th onClick={() => handleSort("company")}>
+              Company Name {renderSortIcon("company")}
+            </th>
+            <th onClick={() => handleSort("title")}>
+              Job Title {renderSortIcon("title")}
+            </th>
+            <th>Job Description</th>
+            <th onClick={() => handleSort("applicationDate")}>
+              Application Date {renderSortIcon("applicationDate")}
+            </th>
+            <th onClick={() => handleSort("dueDate")}>
+              Due Date {renderSortIcon("dueDate")}
+            </th>
+            <th onClick={() => handleSort("lastActionDate")}>
+              Last Action Date {renderSortIcon("lastActionDate")}
+            </th>
+            <th onClick={() => handleSort("status")}>
+              Status {renderSortIcon("status")}
+            </th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+
+        <tbody>
+          {sortedData.map((job, index) => (
+            <tr key={index}>
+              <td>{job.company}</td>
+              <td>{job.title}</td>
+              <td>
+                <a
+                  href={job.jobDescriptionLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View Job
+                </a>
+              </td>
+              <td>{new Date(job.applicationDate).toLocaleDateString()}</td>
+              <td>
+                {job.dueDate
+                  ? new Date(job.dueDate).toLocaleDateString()
+                  : "N/A"}
+              </td>
+              <td>
+                {job.lastActionDate
+                  ? new Date(job.lastActionDate).toLocaleDateString()
+                  : "N/A"}
+              </td>
+              <td>{job.status}</td>
+            </tr>
+          ))}
+
+          {/* Add an empty row with a "+" button */}
+          {!isAdding ? (
+            <tr>
+              <td colSpan='6'></td>
+              <td>
+                <button type="button" onClick={() => setIsAdding(true)}>
+                  +
+                </button>
+              </td>
+            </tr>
+          ) : (
+            <tr>
+              <td>
+                <input
+                  type="text"
+                  placeholder="Company"
+                  value={newJob.company}
+                  onChange={(e) =>
+                    setNewJob({ ...newJob, company: e.target.value })
+                  }
+                  required
+                />
+              </td>
+              <td>
+                <input
+                  type="text"
+                  placeholder="Title"
+                  value={newJob.title}
+                  onChange={(e) =>
+                    setNewJob({ ...newJob, title: e.target.value })
+                  }
+                  required
+                />
+              </td>
+              <td>
+                <input
+                  type="text"
+                  placeholder="Job Description Link"
+                  value={newJob.jobDescriptionLink}
+                  onChange={(e) =>
+                    setNewJob({
+                      ...newJob,
+                      jobDescriptionLink: e.target.value,
+                    })
+                  }
+                />
+              </td>
+              <td>
+                <input
+                  type="date"
+                  value={newJob.applicationDate}
+                  onChange={(e) =>
+                    setNewJob({
+                      ...newJob,
+                      applicationDate: e.target.value,
+                    })
+                  }
+                  required
+                />
+              </td>
+              <td>
+                <input
+                  type="date"
+                  value={newJob.dueDate}
+                  onChange={(e) =>
+                    setNewJob({ ...newJob, dueDate: e.target.value })
+                  }
+                />
+              </td>
+              <td>
+                <input
+                  type="date"
+                  value={newJob.lastActionDate}
+                  onChange={(e) =>
+                    setNewJob({
+                      ...newJob,
+                      lastActionDate: e.target.value,
+                    })
+                  }
+                />
+              </td>
+              <td>
+                <input
+                  type="text"
+                  placeholder="Status"
+                  value={newJob.status}
+                  onChange={(e) =>
+                    setNewJob({ ...newJob, status: e.target.value })
+                  }
+                  required
+                />
+              </td>
+              <td>
+                <button type="submit">Add</button>
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </form>
   );
 };
 
-// Simulate fetching job data dynamically (mocked for now)
 const fetchJobApplications = async (email) => {
-  console.log("testx2");
-  const result = await convex.query(api.myFunctions.getApplications, {
+  const result = await convex?.query(api.myFunctions.getApplications, {
     email,
   });
   return result;
@@ -143,14 +248,13 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("something");
     const fetchData = async () => {
       if (isSignedIn && user?.id) {
         setLoading(true);
         try {
           const data = await fetchJobApplications(
             user.primaryEmailAddress?.emailAddress
-          ); // Pass user email to fetchJobApplications
+          );
           setJobApplications(data);
         } catch (error) {
           console.error("Error fetching job data:", error);
@@ -163,16 +267,16 @@ export default function Home() {
     fetchData();
   }, [isSignedIn, user]);
 
+  const handleAddJobApplication = (newJob) => {
+    setJobApplications([...jobApplications, newJob]);
+  };
+
   if (!isLoaded) {
-    return <div>Loading...</div>; // Wait for Clerk to load user info
+    return <div>Loading...</div>;
   }
 
   if (!isSignedIn) {
-    return <RedirectToSignIn />; // Redirect to sign-in page if not authenticated
-  }
-
-  if (!jobApplications) {
-    return <p>Loading your job applications...</p>;
+    return <RedirectToSignIn />;
   }
 
   return (
@@ -205,7 +309,10 @@ export default function Home() {
         {jobApplications.length === 0 ? (
           <p>No job applications found.</p>
         ) : (
-          <JobApplications jobApplications={jobApplications} />
+          <JobApplications
+            jobApplications={jobApplications}
+            onAddJobApplication={handleAddJobApplication}
+          />
         )}
       </div>
     </div>
