@@ -1,11 +1,14 @@
+import {NextResponse} from "next/server"
 import { upsertJobApplication } from '../../../convex/myFunctions';
 import convex from "../../../lib/convexClient";
 import { mutation } from '../../../convex/_generated/server';
 import { useConvex } from 'convex/react';
 import { api } from "../../../convex/_generated/api";
 
-export default async function handler(req:any, res:any) {
-    if (req.method === 'POST') {
+export async function POST(req:any, res:any) {
+    try {
+        console.log("TESTTESTESTETJIETJISJTIJST");
+        console.log(req)
         // Destructure the input parameters from the request body
         const {
             email,
@@ -31,7 +34,7 @@ export default async function handler(req:any, res:any) {
     
         // Validate required fields
         if (!email || !role || !company || !status || !jobDescriptionLink || !applicationDate || !dueDate || !lastActionDate) {
-            return res.status(400).json({ message: 'All fields are required.' });
+            return new NextResponse("Missing fields", {status:500});
         }
 
         try {
@@ -48,18 +51,16 @@ export default async function handler(req:any, res:any) {
                 throw new Error("Database client not defined");
             }
 
-            res.status(200).json({ message: 'Job application upserted successfully' });
+            return new NextResponse("Data successfully entered", {status:200});
         } catch (error) {
-            res.status(500).json({ error: 'Failed to upsert job application' });
+            return new NextResponse("Request Failed", {status:500});
         }
       // TODO: Add your logic here to handle the data, such as saving it to a database
       // Example: save to a mock database (this part depends on your actual database logic)
   
       // Assuming the process was successful:
       res.status(200).json({ message: 'Process created successfully', data: req.body });
-    } else {
-      // Handle any other HTTP method
-      res.setHeader('Allow', ['POST']);
-      res.status(405).json({ message: `Method ${req.method} Not Allowed` });
+    } catch (error) {
+        console.error("Error in POST handler:", error);
     }
 }
