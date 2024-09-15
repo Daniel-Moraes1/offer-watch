@@ -3,6 +3,17 @@
   "version": "1.0.0",
   "description": "Automatically parse your emails for the application status of jobs &amp; internships.",
   "main": "index.js",
+  "dependencies": {
+    "@google-cloud/local-auth": "^2.1.0",
+    "@google-cloud/pubsub": "^4.7.2",
+    "axios": "^1.7.7",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "googleapis": "^105.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.5"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

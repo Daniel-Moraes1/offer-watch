@@ -11,6 +11,7 @@ import { api } from "../convex/_generated/api";
 import './globals.css';
 import { useState, useEffect } from 'react';
 import { useUser, RedirectToSignIn } from "@clerk/nextjs";
+import { useQuery } from "../convex/_generated/client"; // Path to your Convex client
 
 // Helper function to sort based on the selected column and order
 const sortData = (data, sortColumn, sortDirection) => {
@@ -127,11 +128,15 @@ const fetchJobApplications = async (email) => {
     return <RedirectToSignIn />; // Redirect to sign-in page if not authenticated
   }
 
+  if (!jobApplications) {
+    return <p>Loading your job applications...</p>;
+  }
+
   return (
     <div>
       <h1>Welcome, {user?.firstName}!</h1>
-      {loading ? (
-        <p>Loading your job applications...</p>
+      {jobApplications.length === 0 ? (
+        <p>No job applications found.</p>
       ) : (
         <JobApplications jobApplications={jobApplications} />
       )}
