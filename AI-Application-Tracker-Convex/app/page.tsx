@@ -91,6 +91,15 @@ const JobApplications = ({
     lastActionDate: "",
   });
 
+  const statusOptions = [
+    "Applied",
+    "Pending Interview",
+    "Pending Decision",
+    "Received Offer",
+    "Rejected",
+  ];
+  
+
   useEffect(() => {
     setData(jobApplications); // Ensure `data` updates when `jobApplications` prop changes
   }, [jobApplications]);
@@ -290,11 +299,11 @@ const JobApplications = ({
           ))}
 
           {/* Row for adding a new job */}
+          {/* Row for adding a new job */}
           {!isAdding ? (
             <tr>
-              <td colSpan="6"></td>
-              <td>
-                <button type="button" onClick={() => setIsAdding(true)}>
+              <td colSpan="8" style={{ textAlign: 'right' }}>
+                <button type="button" onClick={() => setIsAdding(true)} style={{ padding: '10px', cursor: 'pointer' }}>
                   +
                 </button>
               </td>
@@ -371,21 +380,26 @@ const JobApplications = ({
                 />
               </td>
               <td>
-                <input
-                  type="text"
-                  placeholder="Status"
+                <select
                   value={newJob.status}
                   onChange={(e) =>
                     setNewJob({ ...newJob, status: e.target.value })
                   }
                   required
-                />
+                >
+                  {statusOptions.map((status, i) => (
+                    <option key={i} value={status}>
+                      {status}
+                    </option>
+                  ))}
+                </select>
               </td>
               <td>
                 <button type="submit">Add</button>
               </td>
             </tr>
           )}
+
         </tbody>
       </table>
     </form>

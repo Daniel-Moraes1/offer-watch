@@ -193,3 +193,29 @@ th:last-child {
   border-radius: 0 10px 10px 0;
   border-right: 0;
 }
+
+/* Style the cell containing the "+" button */
+td.add-job-cell {
+  padding: 0;
+  text-align: center;
+  position: relative;
+}
+
+/* Style the "+" button */
+button.add-job-btn {
+  font-size: 18px;
+  background-color: #ffffff;
+  color: black;
+  border-radius: 50%;
+  border: 1px solid lightgray;
+  padding: 8px;
+  cursor: pointer;
+  width: 40px; /* Adjust width to control size */
+  height: 40px; /* Adjust height to control size */
+  display: inline-block;
+  line-height: 0;
+}
+
+button.add-job-btn:hover {
+  background-color: #f0f0f0;
+}
