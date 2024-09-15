@@ -13,7 +13,11 @@ export const upsertJobApplication = mutation({
     email:v.string(),
     company:v.string(),
     role:v.string(),
-    application:v.any()
+    status:v.string(),
+    jobDescriptionLink:v.string(),
+    applicationDate:v.string(),
+    dueDate:v.string(),
+    lastActionDate:v.string()
   },
 
   // Query implementation.
@@ -29,11 +33,11 @@ export const upsertJobApplication = mutation({
     if (existingDoc) {
       // Document exists, so update it
       await ctx.db.patch(existingDoc._id, {
-        status: args.application.status,
-        jobDescriptionLink: args.application.jobDescriptionLink,
-        applicationDate: args.application.applicationDate,
-        dueDate: args.application.dueDate,
-        lastActionDate: args.application.lastActionDate
+        status: args.status,
+        jobDescriptionLink: args.jobDescriptionLink,
+        applicationDate: args.applicationDate,
+        dueDate: args.dueDate,
+        lastActionDate: args.lastActionDate
       });
     } else {
       // Insert a new document if it doesn't exist
@@ -41,11 +45,11 @@ export const upsertJobApplication = mutation({
         email: args.email,
         company: args.company,
         role: args.role,
-        status: args.application.status,
-        jobDescriptionLink: args.application.jobDescriptionLink,
-        applicationDate: args.application.applicationDate,
-        dueDate: args.application.dueDate,
-        lastActionDate: args.application.lastActionDate
+        status: args.status,
+        jobDescriptionLink: args.jobDescriptionLink,
+        applicationDate: args.applicationDate,
+        dueDate: args.dueDate,
+        lastActionDate: args.lastActionDate
       });
     }
   },
