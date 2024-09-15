@@ -93,6 +93,8 @@ export const deleteJobApplication = mutation({
     applicationDate: v.string(), // Date of application
     dueDate: v.optional(v.string()), // Optional due date
     lastActionDate: v.optional(v.string()), // Optional last action date
+    _creationTime: v.number(),
+    _id: v.string(),
   },
   handler: async (ctx, args) => {
     const {
@@ -104,6 +106,7 @@ export const deleteJobApplication = mutation({
       applicationDate,
       dueDate,
       lastActionDate,
+      _creationTime,
     } = args;
 
     // Check if a job application already exists for the user, company, and role
