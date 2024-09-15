@@ -1,7 +1,3 @@
-import convex from "../lib/convexClient";
-import { api } from "../convex/_generated/api";
-
-
 const express = require("express");
 const bodyParser = require("body-parser");
 const { google } = require("googleapis");
@@ -54,26 +50,33 @@ app.post("/pubsub", async (req, res) => {
       }
     }
 
+    const chatResponse = JSON.parse(
+      await processMessageToChatGPT(subject, body)
+    );
     console.log(`Email Subject:\n${subject}`);
     console.log(`Email Body:\n${body}`);
-
-    const chatResponse = await processMessageToChatGPT(subject, body);
     console.log("chatResponse:", chatResponse);
     if (chatResponse.status !== "Unrelated") {
-      const url = "localhost:3000/api/createProcess"; // Change this to your API endpoint
+      const url = "http://localhost:3000/api/createProcess"; // Change this to your API endpoint
       console.log("PUB SUB ACTIVATED");
       fetch(url, {
-        method: 'POST', 
-        headers: chatResponse
-    })
-    .then(response => response.json())  // Yeah, we like our responses in JSON format! 😎
-    .then(data => console.log('Success:', data))  // Log that sweet success
-    .catch((error) => console.error('Error:', error));  // Or catch any oopsies 🙈
-    res.status(200).send("OK");
+        method: "POST",
+        // headers: chatResponse,
+        headers: {
+          "Content-Type": "application/json",
+          ...chatResponse,
+          email: "daniel.o.ajayi@gmail.com",
+        },
+      })
+        // like our responses in JSON format! 😎
+        .then((response) => console.log("Success:", response)) // Log that sweet success
+        .catch((error) => console.error("Error:", error)); // Or catch any oopsies 🙈
+      res.status(200).send("OK");
+    }
+  } catch (error) {
+    console.error("Error:", error);
   }
-} catch (error) {
-  console.error('Error:', error)
-}});
+});
 
 // Start the Express server
 const PORT = process.env.PORT || 8080;

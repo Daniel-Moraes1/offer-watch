@@ -8,7 +8,7 @@ async function processMessageToChatGPT(emailSubject, emailText) {
         - Job Title
         - Company Name
         - Job Role
-        - Application Status (e.g., Applied, Interviewed, Offered, Rejected)
+        - Application Status (e.g., Applied, Pending Interview, Pending Decision, Received Offer, Rejected)
         - Job Description Link (if any)
         - Application Date
         - Due Date (if any)
@@ -17,7 +17,7 @@ async function processMessageToChatGPT(emailSubject, emailText) {
         Email Subject: ${emailSubject}
         Email Text: ${emailText}
 
-        Please respond with the fields in a structured JSON format. Here is an example:
+        Please respond with the fields in a structured JSON format. The output should not be preceded or followed by any other text. It should not deviate from a JSON objectHere is an example:
         {
           "jobTitle": "Engineer",
           "company": "ALAX",
@@ -29,16 +29,29 @@ async function processMessageToChatGPT(emailSubject, emailText) {
           "lastActionDate": "2024-09-10"
         }
 
+        If the email is related to a job application but some of the fields cannot be inferred from the email, leave them out of the JSON.
+
         If this email isn't related to a job application, respond with this JSON format:
         {
           "status": "Unrelated"
+        }
+
+        Here is an example of a job application email:
+        Subject:
+        Invitation: ZipRecruiter Recruiter Call @ Mon Sep 9, 2024 6:20pm - 6:35pm (EDT) (danielmoraes5542@gmail.com)
+        Email Body:
+
+        Here is an example of the expected output for this email:
+        {
+          "company": "ZipRecruiter",
+          "status": "Pending Interview"
         }
       `;
 
     const apiMessages = [{ role: "user", content: prompt }];
 
     const apiRequestBody = {
-      model: "gpt-3.5-turbo",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
