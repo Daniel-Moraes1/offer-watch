@@ -1,17 +1,13 @@
 // app/page.tsx
 "use client";
 
-import { upsertJobApplication } from '../convex/myFunctions';
 import convex from "../lib/convexClient";
-import { mutation } from '../convex/_generated/server';
-import { useConvex } from 'convex/react';
 import { api } from "../convex/_generated/api";
 
 
 import './globals.css';
 import { useState, useEffect } from 'react';
 import { useUser, RedirectToSignIn } from "@clerk/nextjs";
-import { useQuery } from "../convex/_generated/client"; // Path to your Convex client
 
 // Helper function to sort based on the selected column and order
 const sortData = (data, sortColumn, sortDirection) => {
@@ -96,10 +92,14 @@ const fetchJobApplications = async (email) => {
 
     // post dummy results
     await convex?.mutation(api.myFunctions.upsertJobApplication, {
+      email: "justin.c.okorie@gmail.com",
       company: "Johns Hopkins APL",
-      email: "danielmoraes5542@gmail.com",
-      role: "Software Engineer [2025]",
-      application: "..."
+      role: "SWE",
+      status: "Accepted",
+      jobDescriptionLink: "No link",
+      applicationDate: "2024-09-30",  // ISO date format
+      dueDate: "2024-10-01",           // ISO date format
+      lastActionDate: "2023-04-10"     // ISO date format
     })
     return result;
 };
