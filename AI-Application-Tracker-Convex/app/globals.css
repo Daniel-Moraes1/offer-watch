@@ -77,7 +77,6 @@
   }
 }
 
-
 /* styles/globals.css */
 
 body {
@@ -85,39 +84,112 @@ body {
   color: black;
   font-family: Arial, sans-serif;
   margin: 0;
-  padding: 20px;
+  height: 100dvh;
 }
 
 table {
   width: 100%;
-  border-collapse: collapse; /* Ensures no gaps between cells */
+  /* border-collapse: collapse; Ensures no gaps between cells */
   margin-top: 20px;
+  border-collapse: separate;
+  border-spacing: 0 16px;
 }
 
-th, td {
-  border: 2px solid orange; /* Orange grid lines */
+.column-header {
+  cursor: pointer;
   padding: 10px;
-  text-align: left;
+  border-radius: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14px;
+  font-weight: 500;
+  color: gray;
 }
-
 th {
-  background-color: #e0e0e0; /* Slightly darker gray for the column headers */
-  font-weight: bold;
-  color: black; /* Black text for headers */
-  transition: background-color 0.3s ease; /* Smooth transition effect */
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14px;
+  font-weight: 500;
+  color: gray;
 }
 
 th:hover {
-  background-color: grey; /* Grey background on hover */
+  /* background-color: lightgray; Grey background on hover */
   cursor: pointer; /* Change cursor to pointer for better UX */
+  color: lightgray;
 }
 
 td {
-  background-color: #f5f5f5; /* Lighter gray for the rest of the table */
+  /* background-color: #f5f5f5; Lighter gray for the rest of the table */
   color: black; /* Black text for the cells */
 }
 
 /* Set alternating row colors for better visibility */
 tr:nth-child(even) td {
-  background-color: #f9f9f9;
+  background-color: #e9e9e9;
+}
+
+.applications-container {
+  background-color: #ffffff;
+  border-radius: 24px;
+  row-gap: 10px;
+  padding: 10px;
+  height: calc(100dvh - 130px);
+  -webkit-box-shadow: 1px 4px 26px 0px rgba(0, 0, 0, 0.44);
+  -moz-box-shadow: 1px 4px 26px 0px rgba(0, 0, 0, 0.44);
+  box-shadow: 1px 4px 26px 0px rgba(0, 0, 0, 0.44);
+}
+.welcome-message {
+  -webkit-box-shadow: 1px 4px 26px 0px rgba(0, 0, 0, 0.44);
+  -moz-box-shadow: 1px 4px 26px 0px rgba(0, 0, 0, 0.44);
+  box-shadow: 1px 4px 26px 0px rgba(0, 0, 0, 0.44);
+}
+
+tr {
+  background-color: #f5f5f5;
+  border-radius: 32px;
+  margin: 10px;
+  row-gap: 10px;
+}
+
+.page-container {
+  background-color: #2d8dbc;
+  /* font-family: Helvetica, sans-serif; */
+}
+
+thead.tr {
+  background-color: transparent;
+}
+
+a {
+  color: darkblue;
+}
+
+/* // Set border-radius on the top-left and bottom-left of the first table data on the table row */
+td:first-child,
+th:first-child {
+  border-radius: 14px 0 0 14px;
+}
+
+tbody {
+  row-gap: 10px;
+}
+
+td {
+  padding: 10px;
+  text-align: left;
+  border-right: 2px solid lightgray;
+  height: 44px;
+}
+
+/* // Set border-radius on the top-right and bottom-right of the last table data on the table row */
+td:last-child,
+th:last-child {
+  border-radius: 0 10px 10px 0;
+  border-right: 0;
 }
