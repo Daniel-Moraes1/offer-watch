@@ -61,7 +61,6 @@ export const getApplications = query({
   handler: async (ctx, args) => {
     console.log(args.email);
     const doc = await ctx.db.query("job_applications")
-    //const doc = await ctx.db.query("job_applications")
     .filter((q: any) => q.eq(q.field("email"), args.email)).collect()
     console.log(doc);
     return doc;
