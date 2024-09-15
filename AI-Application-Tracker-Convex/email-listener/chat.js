@@ -8,7 +8,7 @@ async function processMessageToChatGPT(emailSubject, emailText) {
         - Job Title
         - Company Name
         - Job Role
-        - Application Status (e.g., Applied, Interviewed, Offered, Rejected)
+        - Application Status (e.g., Applied, Pending Interview, Pending Decision, Received Offer, Rejected)
         - Job Description Link (if any)
         - Application Date
         - Due Date (if any)
@@ -34,6 +34,17 @@ async function processMessageToChatGPT(emailSubject, emailText) {
         If this email isn't related to a job application, respond with this JSON format:
         {
           "status": "Unrelated"
+        }
+
+        Here is an example of a job application email:
+        Subject:
+        Invitation: ZipRecruiter Recruiter Call @ Mon Sep 9, 2024 6:20pm - 6:35pm (EDT) (danielmoraes5542@gmail.com)
+        Email Body:
+
+        Here is an example of the expected output for this email:
+        {
+          "company": "ZipRecruiter",
+          "status": "Pending Interview"
         }
       `;
 

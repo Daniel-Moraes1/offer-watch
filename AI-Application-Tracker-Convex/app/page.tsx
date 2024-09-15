@@ -111,11 +111,12 @@ const JobApplications = ({
     return sortDirection === "asc" ? " ↑" : " ↓";
   };
 
-  const statusColors = {
-    applied: "#118AB2",
-    pending: "#6fadfd",
-    rejected: "#EF476F",
-    accepted: "#06D6A0",
+  const statusColors: Record<string, string> = {
+    Applied: "#073B4C",
+    "Pending Interview": "#073B4C",
+    "Pending Decision": "#073B4C",
+    "Received Offer": "#06D6A0",
+    Rejected: "#EF476F",
   };
 
   const handleCellChange = (rowIndex, columnId, newValue) => {
@@ -270,7 +271,7 @@ const JobApplications = ({
               </td>
               <td
                 style={{
-                  backgroundColor: statusColors[job.status.toLowerCase()],
+                  backgroundColor: statusColors[job.status],
                   color: "white",
                 }}
               >
