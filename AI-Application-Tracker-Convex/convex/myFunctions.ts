@@ -5,74 +5,81 @@ import { api } from "./_generated/api";
 // Write your Convex functions in any file inside this directory (`convex`).
 // See https://docs.convex.dev/functions for more.
 
-// You can read data from the database via a query:
-export const listNumbers = query({
+// Mutation to add or update a job application
+
+export const upsertJobApplication = mutation({
   // Validators for arguments.
   args: {
-    count: v.number(),
+    email:v.string(),
+    company:v.string(),
+    role:v.string(),
+    application:v.any()
   },
 
   // Query implementation.
   handler: async (ctx, args) => {
+
+      const existingDoc = await ctx.db.query("job_applications")
+    .filter((q: any) => q.eq(q.field("email"), args.email))
+    .filter((q: any) => q.eq(q.field("company"), args.company))
+    .filter((q: any) => q.eq(q.field("role"), args.role))
+    .first();
     //// Read the database as many times as you need here.
     //// See https://docs.convex.dev/database/reading-data.
-    const numbers = await ctx.db
-      .query("numbers")
-      // Ordered by _creationTime, return most recent
-      .order("desc")
-      .take(args.count);
-    return {
-      viewer: (await ctx.auth.getUserIdentity())?.name ?? null,
-      numbers: numbers.toReversed().map((number) => number.value),
-    };
+    if (existingDoc) {
+      // Document exists, so update it
+      await ctx.db.patch(existingDoc._id, {
+        status: args.application.status,
+        jobDescriptionLink: args.application.jobDescriptionLink,
+        applicationDate: args.application.applicationDate,
+        dueDate: args.application.dueDate,
+        lastActionDate: args.application.lastActionDate
+      });
+    } else {
+      // Insert a new document if it doesn't exist
+      await ctx.db.insert("job_applications", {
+        email: args.email,
+        company: args.company,
+        role: args.role,
+        status: args.application.status,
+        jobDescriptionLink: args.application.jobDescriptionLink,
+        applicationDate: args.application.applicationDate,
+        dueDate: args.application.dueDate,
+        lastActionDate: args.application.lastActionDate
+      });
+    }
   },
 });
 
-// You can write data to the database via a mutation:
-export const addNumber = mutation({
-  // Validators for arguments.
-  args: {
-    value: v.number(),
-  },
+/*
+export const upsertJobApplication = mutation(async ({ db }: {db:any}, { email, company, role, application } : { email:string, company:string, role:string, application:any}) => {
+  // Check if a document with the same email, company, and role already exists
+  const existingDoc = await db.query("job_applications")
+    .filter((q: any) => q.eq(q.field("email"), email))
+    .filter((q: any) => q.eq(q.field("company"), company))
+    .filter((q: any) => q.eq(q.field("role"), role))
+    .first();
 
-  // Mutation implementation.
-  handler: async (ctx, args) => {
-    //// Insert or modify documents in the database here.
-    //// Mutations can also read from the database like queries.
-    //// See https://docs.convex.dev/database/writing-data.
-
-    const id = await ctx.db.insert("numbers", { value: args.value });
-
-    console.log("Added new document with id:", id);
-    // Optionally, return a value from your mutation.
-    // return id;
-  },
-});
-
-// You can fetch data from and send data to third-party APIs via an action:
-export const myAction = action({
-  // Validators for arguments.
-  args: {
-    first: v.number(),
-    second: v.string(),
-  },
-
-  // Action implementation.
-  handler: async (ctx, args) => {
-    //// Use the browser-like `fetch` API to send HTTP requests.
-    //// See https://docs.convex.dev/functions/actions#calling-third-party-apis-and-using-npm-packages.
-    // const response = await ctx.fetch("https://api.thirdpartyservice.com");
-    // const data = await response.json();
-
-    //// Query data by running Convex queries.
-    const data = await ctx.runQuery(api.myFunctions.listNumbers, {
-      count: 10,
+  if (existingDoc) {
+    // Document exists, so update it
+    await db.patch(existingDoc._id, {
+      status: application.status,
+      jobDescriptionLink: application.jobDescriptionLink,
+      applicationDate: application.applicationDate,
+      dueDate: application.dueDate,
+      lastActionDate: application.lastActionDate
     });
-    console.log(data);
-
-    //// Write data by running Convex mutations.
-    await ctx.runMutation(api.myFunctions.addNumber, {
-      value: args.first,
+  } else {
+    // Insert a new document if it doesn't exist
+    await db.insert("job_applications", {
+      email,
+      company,
+      role,
+      status: application.status,
+      jobDescriptionLink: application.jobDescriptionLink,
+      applicationDate: application.applicationDate,
+      dueDate: application.dueDate,
+      lastActionDate: application.lastActionDate
     });
-  },
-});
+  }
+}); */
